@@ -1,6 +1,7 @@
 /* GENERAL */
 body {
   font-family: system-ui, "Segoe UI", "Roboto", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  background-image: url("sunset.png");
   background: #ffffff;
   margin: 0;
   padding: 40px;
