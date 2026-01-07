@@ -165,6 +165,7 @@ footer svg {
 /* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
   body {
+    background: #98b1d6;
     padding: 20px;
   }
 
@@ -235,6 +236,7 @@ footer svg {
 
 @media (max-width: 480px) {
   body {
+    background: #98b1d6;
     padding: 15px;
   }
 
