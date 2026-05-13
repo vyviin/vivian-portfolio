@@ -1,15 +1,11 @@
 /**
  * VIVIAN YANG PORTFOLIO — main.js
- * Handles: video hover interaction, page transitions, mobile tap
  */
 
 (function () {
     'use strict';
   
-    /* ── Page-transition fade-in ──────────────────────── */
     const overlay = document.getElementById('pageTransition');
-  
-    /* ── Only run video logic on the home page ────────── */
     const isHome = document.body.classList.contains('home-page');
   
     if (isHome) {
@@ -27,22 +23,32 @@
       const video     = document.getElementById('heroVideo');
       const bgStatic  = document.getElementById('bgStatic');
       const bgVideo   = document.getElementById('bgVideo');
+      const logoToggle = document.getElementById('logoToggle');
   
       if (!zone || !video || !bgStatic || !bgVideo) return;
   
       let hasPlayed   = false;
       let isMobile    = window.matchMedia('(hover: none)').matches;
   
-      /* Preload the video as soon as possible */
+      /* Toggle Media Mode when clicking "vy." */
+      if (logoToggle) {
+        logoToggle.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.body.classList.toggle('media-mode');
+        });
+      }
+
+      /* Preload the video */
       video.load();
   
       /* ── Transition to video ── */
       function showVideo() {
-        if (hasPlayed) return; /* Only play once */
+        // Only play if media-mode is active and it hasn't played yet
+        if (!document.body.classList.contains('media-mode') || hasPlayed) return; 
+        
         hasPlayed = true;
-  
         bgVideo.classList.add('active');
-        /* Slight delay so the cross-fade looks intentional */
+        
         setTimeout(() => {
           video.currentTime = 0;
           video.play().catch(() => {});
@@ -50,60 +56,39 @@
       }
   
       /* ── Transition back to static image ── */
-      function showStatic(immediate) {
-        const delay = immediate ? 0 : 600;
-        setTimeout(() => {
-          bgVideo.classList.remove('active');
-        }, delay);
+      function showStatic() {
+        bgVideo.classList.remove('active');
       }
   
-      /* ── Desktop: mouse enter/leave ── */
+      /* ── Desktop: mouse enter ── */
       zone.addEventListener('mouseenter', () => {
-        if (!hasPlayed) showVideo();
+        showVideo();
       });
   
-      /* ── On video end: hold last frame briefly, then revert ── */
+      /* ── On video end: revert ── */
       video.addEventListener('ended', () => {
-        /* Hold the last frame for 2 s then smoothly revert */
         setTimeout(() => {
-          showStatic(false);
+          showStatic();
         }, 2000);
       });
   
       /* ── Mobile: single tap toggles video ── */
       if (isMobile) {
         zone.addEventListener('click', () => {
-          if (!hasPlayed) {
-            showVideo();
-          }
+          showVideo();
         });
       }
-  
-      /* ── Reinit if window resizes between mobile/desktop ── */
-      window.matchMedia('(hover: none)').addEventListener('change', (e) => {
-        isMobile = e.matches;
-      });
     }
   
-    /* ===================================================
-       PAGE TRANSITIONS (fade out → navigate)
-    =================================================== */
     function initPageTransitions() {
       if (!overlay) return;
-  
-      /* Intercept all same-origin navigation links */
       document.querySelectorAll('a[href]').forEach((link) => {
         const href = link.getAttribute('href');
-        /* Only handle relative links to our pages */
         if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto')) return;
-  
         link.addEventListener('click', (e) => {
-          /* Don't intercept modifier-key clicks (new tab etc.) */
           if (e.ctrlKey || e.metaKey || e.shiftKey) return;
-  
           e.preventDefault();
           overlay.classList.add('fade-out');
-  
           setTimeout(() => {
             window.location.href = href;
           }, 480);
@@ -111,18 +96,10 @@
       });
     }
   
-    /* ===================================================
-       MOBILE HINT — brief ripple to hint at the secret zone
-    =================================================== */
     function showMobileHint() {
       if (!isHome) return;
       const zone = document.getElementById('hoverZone');
-      if (!zone) return;
-  
-      const isTouchDevice = window.matchMedia('(hover: none)').matches;
-      if (!isTouchDevice) return;
-  
-      /* Show hint after 2 seconds on mobile */
+      if (!zone || !window.matchMedia('(hover: none)').matches) return;
       setTimeout(() => {
         zone.classList.add('hint');
         setTimeout(() => zone.classList.remove('hint'), 2200);

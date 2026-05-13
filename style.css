@@ -23,11 +23,10 @@
     --nav-height: 72px;
     --transition-page: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-hover: 0.3s ease;
+    --transition-bg: 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: smooth; }
   
   body {
     font-family: var(--font-body);
@@ -68,7 +67,7 @@
   }
   
   /* =============================================
-     HOME PAGE — FULL-SCREEN BACKGROUND
+     HOME PAGE — BASE STATE (dark, no photo)
      ============================================= */
   
   body.home-page {
@@ -79,48 +78,55 @@
     min-height: 100vh;
   }
   
+  /* ── Background layers ── */
+  
   .bg-layer {
     position: fixed;
     inset: 0;
     z-index: 0;
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .bg-static {
-    opacity: 1;
-  }
-  
-  .bg-video {
     opacity: 0;
+    transition: opacity var(--transition-bg);
+    pointer-events: none;
   }
   
-  .bg-video.active {
-    opacity: 1;
-  }
+  /* Photo shown in media-mode */
+  body.media-mode .bg-static { opacity: 1; }
   
-  .bg-img, .bg-layer video {
+  /* Video shown when active within media-mode */
+  body.media-mode .bg-video.active { opacity: 1; }
+  
+  /* Image/video: slightly zoomed out so more scene is visible */
+  .bg-img,
+  .bg-layer video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 35%;
+    object-position: center 42%;
+    transform: scale(0.90);
+    transform-origin: center center;
   }
   
+  /* Dark gradient: invisible by default, fades in with media-mode */
   .bg-overlay {
     position: fixed;
     inset: 0;
     z-index: 1;
     background: linear-gradient(
       to bottom,
-      rgba(26, 22, 20, 0.15) 0%,
-      rgba(26, 22, 20, 0.0) 30%,
-      rgba(26, 22, 20, 0.0) 60%,
-      rgba(26, 22, 20, 0.55) 100%
+      rgba(26, 22, 20, 0.18) 0%,
+      rgba(26, 22, 20, 0.00) 35%,
+      rgba(26, 22, 20, 0.00) 60%,
+      rgba(26, 22, 20, 0.60) 100%
     );
+    opacity: 0;
+    transition: opacity var(--transition-bg);
     pointer-events: none;
   }
   
+  body.media-mode .bg-overlay { opacity: 1; }
+  
   /* =============================================
-     NAVIGATION — GLASSMORPHISM
+     NAVIGATION
      ============================================= */
   
   nav {
@@ -130,20 +136,28 @@
     right: 0;
     z-index: 100;
     height: var(--nav-height);
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition:
+      background var(--transition-bg),
+      border-color var(--transition-bg),
+      backdrop-filter var(--transition-bg);
   }
   
-  .glass-nav {
+  /* Media Mode: glass nav */
+  body.media-mode nav {
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(12px) saturate(180%);
     -webkit-backdrop-filter: blur(12px) saturate(180%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    border-bottom-color: rgba(255, 255, 255, 0.12);
   }
   
-  .inner-nav {
+  /* Inner page nav */
+  nav.inner-nav {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom-color: rgba(0, 0, 0, 0.06);
   }
   
   .nav-inner {
@@ -156,29 +170,32 @@
     justify-content: space-between;
   }
   
+  /* vy. logo — <button> on homepage, <a> on inner pages */
   .nav-logo {
     font-family: var(--font-display);
     font-size: 28px;
     font-weight: 500;
     font-style: italic;
-    color: rgba(255, 255, 255, 0.92);
-    text-decoration: none;
     letter-spacing: -0.01em;
-    transition: color var(--transition-hover);
-  }
-  
-  .nav-logo.dark {
-    color: var(--color-ink);
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: rgba(245, 232, 228, 0.85);
+    transition: color var(--transition-hover), transform var(--transition-hover);
   }
   
   .nav-logo:hover {
-    color: var(--color-petal);
+    color: rgba(255, 255, 255, 0.98);
+    transform: scale(1.05);
   }
   
-  .nav-logo.dark:hover {
-    color: var(--color-accent);
-  }
+  /* Inner pages: dark anchor */
+  a.nav-logo.dark  { color: var(--color-ink); }
+  a.nav-logo.dark:hover { color: var(--color-accent); transform: none; }
   
+  /* Nav links */
   .nav-links {
     display: flex;
     gap: 36px;
@@ -192,9 +209,9 @@
     letter-spacing: 0.08em;
     text-transform: lowercase;
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.75);
-    transition: color var(--transition-hover);
+    color: rgba(245, 232, 228, 0.62);
     position: relative;
+    transition: color var(--transition-hover);
   }
   
   .nav-link::after {
@@ -204,32 +221,21 @@
     left: 0;
     width: 0;
     height: 1px;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(245, 232, 228, 0.6);
     transition: width var(--transition-hover);
   }
   
-  .nav-link.dark {
-    color: var(--color-muted);
-  }
-  
-  .nav-link.dark::after {
-    background: var(--color-accent);
-  }
-  
   .nav-link:hover,
-  .nav-link.active {
-    color: rgba(255, 255, 255, 0.98);
-  }
-  
-  .nav-link.dark:hover,
-  .nav-link.dark.active {
-    color: var(--color-ink);
-  }
+  .nav-link.active { color: rgba(255, 255, 255, 0.95); }
   
   .nav-link:hover::after,
-  .nav-link.active::after {
-    width: 100%;
-  }
+  .nav-link.active::after { width: 100%; }
+  
+  /* Inner-page overrides */
+  .nav-link.dark { color: var(--color-muted); }
+  .nav-link.dark::after { background: var(--color-accent); }
+  .nav-link.dark:hover,
+  .nav-link.dark.active { color: var(--color-ink); }
   
   /* =============================================
      HERO — HOME PAGE
@@ -264,7 +270,7 @@
     font-size: 15px;
     font-weight: 300;
     letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(245, 232, 228, 0.58);
     text-transform: lowercase;
     margin-bottom: 4px;
   }
@@ -274,33 +280,84 @@
     font-size: clamp(72px, 10vw, 130px);
     font-weight: 300;
     line-height: 0.9;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(245, 232, 228, 0.95);
     letter-spacing: -0.02em;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
   
-  .name-accent {
-    color: var(--color-petal);
+  .name-accent { color: var(--color-petal); }
+  
+  /* =============================================
+     EDUCATION BULLETS — TRIANGLE NUDGE
+     ============================================= */
+  
+  .edu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 36px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
   }
   
-  .hero-bio {
-    margin-bottom: 40px;
+  .edu-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    cursor: default;
   }
   
-  .hero-bio p {
+  /*
+    Pure-CSS right-pointing triangle.
+    Achieved with a zero-width/height element + borders.
+    border-left = the visible "fill" face of the triangle.
+  */
+  .tri {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 0;
+    height: 0;
+    border-top:    5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left:   7px solid rgba(232, 196, 190, 0.60);
+    margin-top: 1px; /* optical alignment */
+    transition:
+      transform        0.30s cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-left-color 0.28s ease;
+  }
+  
+  /* On row hover: nudge right + brighten */
+  .edu-item:hover .tri {
+    transform: translateX(7px);
+    border-left-color: var(--color-petal);
+  }
+  
+  .edu-text {
     font-size: 15px;
     font-weight: 300;
-    color: rgba(255, 255, 255, 0.6);
-    letter-spacing: 0.04em;
+    color: rgba(245, 232, 228, 0.62);
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+    transition: color 0.25s ease;
   }
   
-  .bio-school {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 17px !important;
-    color: rgba(255, 255, 255, 0.5) !important;
-    margin-top: 4px;
+  .edu-item:hover .edu-text {
+    color: rgba(245, 232, 228, 0.90);
   }
+  
+  /* Second line: italic Cormorant, slightly dimmer */
+  .edu-school {
+    font-family: var(--font-display) !important;
+    font-style: italic !important;
+    font-size: 17px !important;
+    color: rgba(245, 232, 228, 0.44) !important;
+  }
+  
+  .edu-item:hover .edu-school {
+    color: rgba(245, 232, 228, 0.72) !important;
+  }
+  
+  /* ── CTA Buttons ── */
   
   .hero-actions {
     display: flex;
@@ -317,14 +374,14 @@
     text-transform: lowercase;
     text-decoration: none;
     color: var(--color-ink);
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(245, 232, 228, 0.90);
     padding: 12px 28px;
     border-radius: 2px;
     transition: background var(--transition-hover), transform var(--transition-hover);
   }
   
   .btn-primary:hover {
-    background: white;
+    background: #ffffff;
     transform: translateY(-2px);
   }
   
@@ -335,46 +392,50 @@
     letter-spacing: 0.1em;
     text-transform: lowercase;
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.75);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(245, 232, 228, 0.68);
+    border-bottom: 1px solid rgba(245, 232, 228, 0.26);
     padding-bottom: 2px;
     transition: color var(--transition-hover), border-color var(--transition-hover);
   }
   
   .btn-ghost:hover {
     color: rgba(255, 255, 255, 0.98);
-    border-color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.65);
   }
   
   /* =============================================
      INVISIBLE HOVER ZONE
+     Disabled (pointer-events: none) until media-mode
      ============================================= */
   
   .hover-zone {
     position: fixed;
     z-index: 50;
+    pointer-events: none;   /* OFF by default */
     cursor: crosshair;
-    /* === ADJUST THESE to where Vivian stands in IMG_0487.jpg ===
-       Tweak right/top/width/height until the invisible zone sits
-       over the person in the photo. Start with the defaults below
-       and use browser DevTools to fine-tune. */
-    right: 10%;
-    top: 20%;
-    width: 20%;
-    height: 55%;
+    /*
+      Adjust right / top / width / height to sit over Vivian in the photo.
+      Dev tip: temporarily add  background: rgba(255,0,0,0.25);  to see the zone.
+    */
+    right: 8%;
+    top: 15%;
+    width: 22%;
+    height: 60%;
     background: transparent;
     border-radius: 50%;
   }
   
-  /* Subtle ripple hint so users can discover the zone on mobile */
+  /* Enabled only in media-mode */
+  body.media-mode .hover-zone {
+    pointer-events: all;
+  }
+  
   .hover-zone.hint::after {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 60px;
-    height: 60px;
+    width: 60px; height: 60px;
     border: 1.5px solid rgba(255, 255, 255, 0.35);
     border-radius: 50%;
     animation: rippleHint 2s ease-out forwards;
@@ -400,7 +461,7 @@
   }
   
   .footer-icon {
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(245, 232, 228, 0.40);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -408,18 +469,12 @@
   }
   
   .footer-icon:hover {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.85);
     transform: translateY(-3px);
   }
   
-  .footer-icon.dark {
-    color: var(--color-muted);
-  }
-  
-  .footer-icon.dark:hover {
-    color: var(--color-accent);
-    transform: translateY(-3px);
-  }
+  .footer-icon.dark       { color: var(--color-muted); }
+  .footer-icon.dark:hover { color: var(--color-accent); transform: translateY(-3px); }
   
   /* =============================================
      INNER PAGES (Projects, Connect)
@@ -442,9 +497,7 @@
     margin-right: auto;
   }
   
-  .inner-header {
-    margin-bottom: 64px;
-  }
+  .inner-header { margin-bottom: 64px; }
   
   .section-eyebrow {
     font-family: var(--font-body);
@@ -578,10 +631,7 @@
      CONNECT PAGE
      ============================================= */
   
-  .connect-main {
-    display: flex;
-    flex-direction: column;
-  }
+  .connect-main { display: flex; flex-direction: column; }
   
   .connect-grid {
     display: flex;
@@ -605,7 +655,7 @@
     transform: translateY(12px);
   }
   
-  .connect-card:nth-child(1) { animation-delay: 0.1s; }
+  .connect-card:nth-child(1) { animation-delay: 0.10s; }
   .connect-card:nth-child(2) { animation-delay: 0.18s; }
   .connect-card:nth-child(3) { animation-delay: 0.26s; }
   .connect-card:nth-child(4) { animation-delay: 0.34s; }
@@ -629,9 +679,7 @@
     transition: background var(--transition-hover);
   }
   
-  .connect-card:hover .connect-icon {
-    background: rgba(196, 122, 106, 0.15);
-  }
+  .connect-card:hover .connect-icon { background: rgba(196, 122, 106, 0.15); }
   
   .connect-info {
     flex: 1;
@@ -685,72 +733,40 @@
      ============================================= */
   
   @media (max-width: 768px) {
-    :root {
-      --nav-height: 60px;
-    }
+    :root { --nav-height: 60px; }
   
-    .nav-inner {
-      padding: 0 24px;
-    }
+    .nav-inner { padding: 0 24px; }
   
     .hero-main {
       padding: 0 28px 60px;
       align-items: flex-end;
     }
   
-    .hero-name {
-      font-size: clamp(60px, 16vw, 80px);
-    }
+    .hero-name { font-size: clamp(60px, 16vw, 80px); }
   
-    .home-footer {
-      gap: 20px;
-      padding-bottom: 28px;
-    }
+    .home-footer { gap: 20px; padding-bottom: 28px; }
   
-    .inner-main {
-      padding: 56px 28px 40px;
-    }
+    .inner-main { padding: 56px 28px 40px; }
   
-    .section-title {
-      font-size: clamp(44px, 12vw, 68px);
-    }
+    .section-title { font-size: clamp(44px, 12vw, 68px); }
   
-    .projects-grid {
-      grid-template-columns: 1fr;
-    }
+    .projects-grid { grid-template-columns: 1fr; }
   
-    .connect-card {
-      padding: 20px;
-    }
+    .connect-card { padding: 20px; }
   
-    .inner-footer {
-      padding: 28px 24px;
-      gap: 20px;
-    }
+    .inner-footer { padding: 28px 24px; gap: 20px; }
   
-    /* On mobile, hover zone becomes a tap zone; show a brief hint */
     .hover-zone {
-      right: 5%;
-      width: 30%;
-      height: 40%;
-      top: 25%;
+      right: 4%;
+      width: 28%;
+      height: 45%;
+      top: 18%;
     }
   }
   
   @media (max-width: 480px) {
-    .nav-links {
-      gap: 20px;
-    }
-  
-    .nav-link {
-      font-size: 13px;
-    }
-  
-    .hero-actions {
-      gap: 14px;
-    }
-  
-    .connect-value {
-      font-size: 16px;
-    }
+    .nav-links { gap: 20px; }
+    .nav-link  { font-size: 13px; }
+    .hero-actions { gap: 14px; }
+    .connect-value { font-size: 16px; }
   }
