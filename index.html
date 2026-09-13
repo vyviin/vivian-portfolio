@@ -8,50 +8,42 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- Only the one glyph needed (杨), via the Google Fonts text= subsetting param — keeps this to a few KB instead of a whole CJK font. -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@600;900&text=%E6%9D%A8&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var night = stored ? stored === 'night' : (function () {
+          var h = new Date().getHours();
+          return h >= 19 || h < 7;
+        })();
+        if (night) document.documentElement.setAttribute('data-theme', 'night');
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
-<!--
-  Default state  → body.home-page          (dark bg, dark text on nav/hero)
-  Media Mode     → body.home-page.media-mode (photo/video bg, light text)
--->
 <body class="home-page">
-
-  <!-- ── Background layers (hidden until Media Mode) ── -->
-  <div class="bg-layer bg-static" id="bgStatic">
-    <img src="background-pic.JPG" alt="Cherry blossoms" class="bg-img" />
-  </div>
-  <div class="bg-layer bg-video" id="bgVideo">
-    <video
-      id="heroVideo"
-      src="background-video.mp4"
-      muted
-      playsinline
-      preload="auto"
-    ></video>
-  </div>
-  <div class="bg-overlay" id="bgOverlay"></div>
 
   <!-- ── Navigation ── -->
   <nav id="mainNav">
     <div class="nav-inner">
-      <!-- vy. is the easter-egg toggle on homepage only -->
-      <button
-        class="nav-logo"
-        id="logoToggle"
-        aria-label="Toggle media mode"
-        title="✦"
-      >vy.</button>
+      <a href="index.html" class="nav-logo">vy.</a>
       <div class="nav-links">
         <a href="index.html" class="nav-link active">home</a>
         <a href="projects.html" class="nav-link">projects</a>
-        <a href="connect.html" class="nav-link">connect</a>
+        <a href="hello.html" class="nav-link">connect</a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle day and night mode" aria-pressed="false">
+          <span class="theme-toggle-icon" aria-hidden="true">☾</span>
+        </button>
       </div>
     </div>
   </nav>
 
   <!-- ── Hero Content ── -->
   <main class="hero-main">
-    <div class="hero-text">
+    <div class="hero-left">
       <p class="hero-eyebrow">hi, i'm</p>
       <h1 class="hero-name">Vivian<span class="name-accent">.</span></h1>
 
@@ -67,17 +59,17 @@
 
       <div class="hero-actions">
         <a href="projects.html" class="btn-primary">view projects →</a>
-        <a href="connect.html" class="btn-ghost">say hello</a>
+        <a href="hello.html" class="btn-ghost">say hello</a>
+      </div>
+    </div>
+
+    <!-- ── 杨, sampled from a real rendered glyph and drawn in tiny 杨s ── -->
+    <div class="hero-right">
+      <div class="glyph-box" id="glyphBox" aria-hidden="true">
+        <canvas id="glyphCanvas"></canvas>
       </div>
     </div>
   </main>
-
-  <!-- ── Invisible hover zone (only active in Media Mode) ── -->
-  <div
-    class="hover-zone"
-    id="hoverZone"
-    aria-hidden="true"
-  ></div>
 
   <!-- ── Footer ── -->
   <footer class="home-footer">

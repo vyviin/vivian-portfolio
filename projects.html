@@ -8,6 +8,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var night = stored ? stored === 'night' : (function () {
+          var h = new Date().getHours();
+          return h >= 19 || h < 7;
+        })();
+        if (night) document.documentElement.setAttribute('data-theme', 'night');
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="inner-page">
@@ -18,7 +30,10 @@
       <div class="nav-links">
         <a href="index.html" class="nav-link dark">home</a>
         <a href="projects.html" class="nav-link dark active">projects</a>
-        <a href="connect.html" class="nav-link dark">connect</a>
+        <a href="hello.html" class="nav-link dark">connect</a>
+        <button class="theme-toggle dark" id="themeToggle" type="button" aria-label="Toggle day and night mode" aria-pressed="false">
+          <span class="theme-toggle-icon" aria-hidden="true">☾</span>
+        </button>
       </div>
     </div>
   </nav>
@@ -29,25 +44,13 @@
       <h1 class="section-title">Projects</h1>
     </div>
 
-    <!-- Project cards — populate with your real projects -->
+    <!-- Placeholder while this page is being revamped -->
     <div class="projects-grid">
 
       <article class="project-card">
-        <div class="card-tag">web</div>
-        <h2 class="card-title">Personal Portfolio</h2>
-        <p class="card-desc">This very site — built with vanilla HTML, CSS, and JS. Designed for a dreamy, editorial feel with a cherry-blossom hero and smooth page transitions.</p>
-        <div class="card-stack">
-          <span class="stack-tag">HTML</span>
-          <span class="stack-tag">CSS</span>
-          <span class="stack-tag">JS</span>
-        </div>
-        <a href="#" class="card-link">view project →</a>
-      </article>
-
-      <article class="project-card">
-        <div class="card-tag">coming soon</div>
-        <h2 class="card-title">More on the way</h2>
-        <p class="card-desc">Currently working on some exciting projects. Check back soon!</p>
+        <div class="card-tag">revamp in progress</div>
+        <h2 class="card-title">New projects coming soon</h2>
+        <p class="card-desc">This page is getting a refresh — check back soon.</p>
         <div class="card-stack">
           <span class="stack-tag">...</span>
         </div>
@@ -72,6 +75,6 @@
   </footer>
 
   <div class="page-transition" id="pageTransition"></div>
-  <script src="main.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

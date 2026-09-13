@@ -17,25 +17,63 @@
     --color-dusk: #2c1f1d;
     --color-ink: #1a1614;
     --color-muted: #8a7b78;
-    --color-accent: #c47a6a;
+    --color-accent: #c96677; /* warmer, less purple/magenta-leaning rose pink */
     --color-white: #ffffff;
     --color-offwhite: #faf8f6;
     --nav-height: 72px;
     --transition-page: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-hover: 0.3s ease;
     --transition-bg: 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Day/night theme tokens */
+    --surface-hero:  var(--color-offwhite);
+    --surface-inner: var(--color-offwhite);
+    --surface-card:  var(--color-white);
+    --surface-card-rgb: 255, 255, 255;
+    --text-strong:  var(--color-ink);
+    --text-muted:   var(--color-muted);
+    --hairline-rgb: 0, 0, 0;
+    /* Home hero text/nav/button color, as an rgb triplet so it can carry
+       varying opacity (same pattern as --hairline-rgb above) — the hero
+       used to be dark in both themes, so this was hardcoded; now it
+       flips like every other surface. */
+    --hero-ink-rgb: 26, 22, 20;
+
+    /* Jar/star pastel palette — kept to 4 so the choice stays simple.
+       Pink/blue/green/yellow as requested, all lightened to match
+       petal/lemon's own brightness — the first green/blue pass read as
+       too dark/muted next to those two. Variable names (and the
+       "mint"/"sky" color_key values already stored in Supabase) are kept
+       as-is on purpose — only the hex values changed, no data migration
+       needed for old messages. */
+    --star-pink:  var(--color-petal);
+    --star-lemon: #f3e3ac;
+    --star-mint:  #c3d9b3; /* light sage green */
+    --star-sky:   #bcd6e6; /* light powder blue */
   }
-  
+
+  [data-theme="night"] {
+    --surface-hero:  #0d0b0a;
+    --surface-inner: #15110f;
+    --surface-card:  #1f1a17;
+    --surface-card-rgb: 31, 26, 23;
+    --text-strong:  #f3ebe7;
+    --text-muted:   #a89a95;
+    --hairline-rgb: 255, 255, 255;
+    --hero-ink-rgb: 245, 232, 228;
+  }
+
   html { scroll-behavior: smooth; }
-  
+
   body {
     font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.6;
-    color: var(--color-ink);
+    color: var(--text-strong);
     min-height: 100vh;
     overflow-x: hidden;
     cursor: default;
+    transition: background-color 0.4s ease, color 0.4s ease;
   }
   
   /* =============================================
@@ -45,7 +83,7 @@
   .page-transition {
     position: fixed;
     inset: 0;
-    background: var(--color-white);
+    background: var(--surface-card);
     z-index: 9999;
     pointer-events: none;
     opacity: 0;
@@ -67,64 +105,17 @@
   }
   
   /* =============================================
-     HOME PAGE — BASE STATE (dark, no photo)
+     HOME PAGE — BASE STATE
      ============================================= */
-  
+
   body.home-page {
-    background: #1a1614;
+    background: var(--surface-hero);
     position: relative;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
   }
-  
-  /* ── Background layers ── */
-  
-  .bg-layer {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    opacity: 0;
-    transition: opacity var(--transition-bg);
-    pointer-events: none;
-  }
-  
-  /* Photo shown in media-mode */
-  body.media-mode .bg-static { opacity: 1; }
-  
-  /* Video shown when active within media-mode */
-  body.media-mode .bg-video.active { opacity: 1; }
-  
-  /* Image/video: slightly zoomed out so more scene is visible */
-  .bg-img,
-  .bg-layer video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 42%;
-    transform: scale(0.90);
-    transform-origin: center center;
-  }
-  
-  /* Dark gradient: invisible by default, fades in with media-mode */
-  .bg-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(
-      to bottom,
-      rgba(26, 22, 20, 0.18) 0%,
-      rgba(26, 22, 20, 0.00) 35%,
-      rgba(26, 22, 20, 0.00) 60%,
-      rgba(26, 22, 20, 0.60) 100%
-    );
-    opacity: 0;
-    transition: opacity var(--transition-bg);
-    pointer-events: none;
-  }
-  
-  body.media-mode .bg-overlay { opacity: 1; }
-  
+
   /* =============================================
      NAVIGATION
      ============================================= */
@@ -144,20 +135,12 @@
       backdrop-filter var(--transition-bg);
   }
   
-  /* Media Mode: glass nav */
-  body.media-mode nav {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-    border-bottom-color: rgba(255, 255, 255, 0.12);
-  }
-  
   /* Inner page nav */
   nav.inner-nav {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(var(--surface-card-rgb), 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom-color: rgba(0, 0, 0, 0.06);
+    border-bottom-color: rgba(var(--hairline-rgb), 0.06);
   }
   
   .nav-inner {
@@ -182,17 +165,17 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    color: rgba(245, 232, 228, 0.85);
+    color: rgba(var(--hero-ink-rgb), 0.85);
     transition: color var(--transition-hover), transform var(--transition-hover);
   }
   
   .nav-logo:hover {
-    color: rgba(255, 255, 255, 0.98);
+    color: rgb(var(--hero-ink-rgb));
     transform: scale(1.05);
   }
   
   /* Inner pages: dark anchor */
-  a.nav-logo.dark  { color: var(--color-ink); }
+  a.nav-logo.dark  { color: var(--text-strong); }
   a.nav-logo.dark:hover { color: var(--color-accent); transform: none; }
   
   /* Nav links */
@@ -209,7 +192,7 @@
     letter-spacing: 0.08em;
     text-transform: lowercase;
     text-decoration: none;
-    color: rgba(245, 232, 228, 0.62);
+    color: rgba(var(--hero-ink-rgb), 0.62);
     position: relative;
     transition: color var(--transition-hover);
   }
@@ -221,22 +204,56 @@
     left: 0;
     width: 0;
     height: 1px;
-    background: rgba(245, 232, 228, 0.6);
+    background: rgba(var(--hero-ink-rgb), 0.6);
     transition: width var(--transition-hover);
   }
   
   .nav-link:hover,
-  .nav-link.active { color: rgba(255, 255, 255, 0.95); }
+  .nav-link.active { color: rgb(var(--hero-ink-rgb)); }
   
   .nav-link:hover::after,
   .nav-link.active::after { width: 100%; }
   
   /* Inner-page overrides */
-  .nav-link.dark { color: var(--color-muted); }
+  .nav-link.dark { color: var(--text-muted); }
   .nav-link.dark::after { background: var(--color-accent); }
   .nav-link.dark:hover,
-  .nav-link.dark.active { color: var(--color-ink); }
-  
+  .nav-link.dark.active { color: var(--text-strong); }
+
+  /* Day/night toggle */
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(var(--hero-ink-rgb), 0.24);
+    background: transparent;
+    color: rgba(var(--hero-ink-rgb), 0.75);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color var(--transition-hover), border-color var(--transition-hover),
+                background var(--transition-hover), transform var(--transition-hover);
+  }
+
+  .theme-toggle:hover {
+    color: rgb(var(--hero-ink-rgb));
+    border-color: rgba(var(--hero-ink-rgb), 0.5);
+    transform: scale(1.08);
+  }
+
+  .theme-toggle.dark {
+    border-color: rgba(var(--hairline-rgb), 0.14);
+    color: var(--text-muted);
+  }
+
+  .theme-toggle.dark:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
   /* =============================================
      HERO — HOME PAGE
      ============================================= */
@@ -246,21 +263,38 @@
     z-index: 10;
     flex: 1;
     display: flex;
-    align-items: flex-end;
-    padding: 0 60px 80px;
+    align-items: stretch;
+    gap: clamp(16px, 4vw, 48px);
+    padding: clamp(28px, 5vw, 44px) 60px 40px;
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
     margin-top: var(--nav-height);
     min-height: calc(100vh - var(--nav-height) - 80px);
   }
-  
-  .hero-text {
+
+  /* Two independent columns — .hero-left sizes/positions the text on its
+     own (pinned near the bottom of its own column); .hero-right is a
+     separate box the glyph canvas lives in and can't affect .hero-left's
+     layout no matter what happens inside it. */
+  .hero-left {
+    flex: 0 1 560px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: clamp(64px, 10vh, 112px);
     animation: heroReveal 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     opacity: 0;
     transform: translateY(20px);
   }
-  
+
+  .hero-right {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
   @keyframes heroReveal {
     to { opacity: 1; transform: translateY(0); }
   }
@@ -270,7 +304,7 @@
     font-size: 15px;
     font-weight: 300;
     letter-spacing: 0.12em;
-    color: rgba(245, 232, 228, 0.58);
+    color: rgba(var(--hero-ink-rgb), 0.58);
     text-transform: lowercase;
     margin-bottom: 4px;
   }
@@ -280,7 +314,7 @@
     font-size: clamp(72px, 10vw, 130px);
     font-weight: 300;
     line-height: 0.9;
-    color: rgba(245, 232, 228, 0.95);
+    color: rgba(var(--hero-ink-rgb), 0.95);
     letter-spacing: -0.02em;
     margin-bottom: 28px;
   }
@@ -308,7 +342,7 @@
   .edu-text {
     font-size: 15px;
     font-weight: 300;
-    color: rgba(245, 232, 228, 0.62);
+    color: rgba(var(--hero-ink-rgb), 0.62);
     letter-spacing: 0.03em;
     line-height: 1.4;
   }
@@ -318,7 +352,7 @@
     font-family: var(--font-display) !important;
     font-style: italic !important;
     font-size: 17px !important;
-    color: rgba(245, 232, 228, 0.44) !important;
+    color: rgba(var(--hero-ink-rgb), 0.44) !important;
   }
   
   /* ── CTA Buttons ── */
@@ -337,18 +371,18 @@
     letter-spacing: 0.1em;
     text-transform: lowercase;
     text-decoration: none;
-    color: var(--color-ink);
-    background: rgba(245, 232, 228, 0.90);
+    color: var(--surface-hero);
+    background: rgba(var(--hero-ink-rgb), 0.90);
     padding: 12px 28px;
     border-radius: 2px;
-    transition: background var(--transition-hover), transform var(--transition-hover);
+    transition: background var(--transition-hover), transform var(--transition-hover), filter var(--transition-hover);
   }
-  
+
   .btn-primary:hover {
-    background: #ffffff;
+    filter: brightness(1.1);
     transform: translateY(-2px);
   }
-  
+
   .btn-ghost {
     font-family: var(--font-body);
     font-size: 13px;
@@ -356,58 +390,80 @@
     letter-spacing: 0.1em;
     text-transform: lowercase;
     text-decoration: none;
-    color: rgba(245, 232, 228, 0.68);
-    border-bottom: 1px solid rgba(245, 232, 228, 0.26);
+    color: rgba(var(--hero-ink-rgb), 0.68);
+    border-bottom: 1px solid rgba(var(--hero-ink-rgb), 0.26);
     padding-bottom: 2px;
     transition: color var(--transition-hover), border-color var(--transition-hover);
   }
-  
+
   .btn-ghost:hover {
-    color: rgba(255, 255, 255, 0.98);
-    border-color: rgba(255, 255, 255, 0.65);
+    color: rgb(var(--hero-ink-rgb));
+    border-color: rgb(var(--hero-ink-rgb));
+  }
+
+  /* Paired with .btn-primary (same shape/size) wherever two actions
+     need to read as a matched set, e.g. dialog close/done buttons. */
+  .btn-secondary {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: lowercase;
+    text-decoration: none;
+    color: var(--text-strong);
+    background: transparent;
+    border: 1px solid rgba(var(--hairline-rgb), 0.18);
+    padding: 12px 28px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background var(--transition-hover), border-color var(--transition-hover), color var(--transition-hover);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(var(--hairline-rgb), 0.04);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .btn-primary:disabled,
+  .btn-secondary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none; /* hover styles never engage while disabled */
   }
   
   /* =============================================
-     INVISIBLE HOVER ZONE
-     Disabled (pointer-events: none) until media-mode
+     杨 GLYPH MOSAIC (decorative, home hero only)
      ============================================= */
-  
-  .hover-zone {
-    position: fixed;
-    z-index: 50;
-    pointer-events: none;   /* OFF by default */
-    cursor: crosshair;
-    /*
-      Adjust right / top / width / height to sit over Vivian in the photo.
-      Dev tip: temporarily add  background: rgba(255,0,0,0.25);  to see the zone.
-    */
-    right: 8%;
-    top: 15%;
-    width: 22%;
-    height: 60%;
-    background: transparent;
-    border-radius: 50%;
-  }
-  
-  /* Enabled only in media-mode */
-  body.media-mode .hover-zone {
-    pointer-events: all;
-  }
-  
-  .hover-zone.hint::after {
-    content: '';
+
+  /* A large 杨 is rendered off-screen once to sample which points fall
+     inside a stroke; hundreds of tiny 杨s are drawn at those points every
+     frame on this canvas, each easing back toward its seed spot with a
+     light spring and a gentle ambient sway, pushed aside when the cursor
+     passes near. Bottom-anchored (sits a bit lower than the "say hello"
+     row on purpose) rather than top-anchored. See initGlyphMosaic() in
+     script.js. */
+  .glyph-box {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60px; height: 60px;
-    border: 1.5px solid rgba(255, 255, 255, 0.35);
-    border-radius: 50%;
-    animation: rippleHint 2s ease-out forwards;
+    /* Same value as .hero-left's padding-bottom, on purpose — the two
+       columns share a box height (align-items:stretch on .hero-main), so
+       matching offsets here puts 杨's bottom edge exactly level with the
+       bottom of the text block instead of at some unrelated height. */
+    bottom: clamp(64px, 10vh, 112px);
+    right: 0;
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 1 / 1;
+    z-index: 5;
+    pointer-events: none;
   }
-  
-  @keyframes rippleHint {
-    0%   { opacity: 1;  transform: translate(-50%, -50%) scale(0.5); }
-    100% { opacity: 0;  transform: translate(-50%, -50%) scale(2.5); }
+
+  #glyphCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    pointer-events: auto; /* .glyph-box itself stays pointer-events:none */
   }
   
   /* =============================================
@@ -425,7 +481,7 @@
   }
   
   .footer-icon {
-    color: rgba(245, 232, 228, 0.40);
+    color: rgba(var(--hero-ink-rgb), 0.40);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -433,11 +489,11 @@
   }
   
   .footer-icon:hover {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgb(var(--hero-ink-rgb));
     transform: translateY(-3px);
   }
   
-  .footer-icon.dark       { color: var(--color-muted); }
+  .footer-icon.dark       { color: var(--text-muted); }
   .footer-icon.dark:hover { color: var(--color-accent); transform: translateY(-3px); }
   
   /* =============================================
@@ -445,7 +501,7 @@
      ============================================= */
   
   body.inner-page {
-    background: var(--color-offwhite);
+    background: var(--surface-inner);
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -478,15 +534,15 @@
     font-size: clamp(52px, 7vw, 96px);
     font-weight: 300;
     line-height: 0.95;
-    color: var(--color-ink);
+    color: var(--text-strong);
     letter-spacing: -0.02em;
   }
-  
+
   .section-subtitle {
     margin-top: 20px;
     font-size: 17px;
     font-weight: 300;
-    color: var(--color-muted);
+    color: var(--text-muted);
     max-width: 480px;
     line-height: 1.7;
   }
@@ -502,14 +558,14 @@
   }
   
   .project-card {
-    background: var(--color-white);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: var(--surface-card);
+    border: 1px solid rgba(var(--hairline-rgb), 0.06);
     border-radius: 4px;
     padding: 36px 32px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    transition: transform var(--transition-hover), box-shadow var(--transition-hover), border-color var(--transition-hover);
+    transition: transform var(--transition-hover), box-shadow var(--transition-hover), border-color var(--transition-hover), background-color 0.4s ease;
     animation: cardReveal 0.6s ease forwards;
     opacity: 0;
     transform: translateY(16px);
@@ -526,7 +582,7 @@
   .project-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
-    border-color: rgba(196, 122, 106, 0.2);
+    border-color: rgba(201, 102, 119, 0.2);
   }
   
   .card-tag {
@@ -535,7 +591,7 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-accent);
-    background: rgba(196, 122, 106, 0.08);
+    background: rgba(201, 102, 119, 0.08);
     display: inline-block;
     padding: 4px 10px;
     border-radius: 2px;
@@ -546,41 +602,41 @@
     font-family: var(--font-display);
     font-size: 28px;
     font-weight: 400;
-    color: var(--color-ink);
+    color: var(--text-strong);
     line-height: 1.1;
     letter-spacing: -0.01em;
   }
-  
+
   .card-desc {
     font-size: 14px;
-    color: var(--color-muted);
+    color: var(--text-muted);
     line-height: 1.7;
     flex: 1;
   }
-  
+
   .card-stack {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .stack-tag {
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.06em;
-    color: var(--color-muted);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: var(--text-muted);
+    border: 1px solid rgba(var(--hairline-rgb), 0.1);
     padding: 3px 10px;
     border-radius: 2px;
   }
-  
+
   .card-link {
     font-size: 13px;
     font-weight: 400;
     letter-spacing: 0.06em;
-    color: var(--color-ink);
+    color: var(--text-strong);
     text-decoration: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(var(--hairline-rgb), 0.2);
     padding-bottom: 1px;
     align-self: flex-start;
     transition: color var(--transition-hover), border-color var(--transition-hover);
@@ -595,7 +651,13 @@
      CONNECT PAGE
      ============================================= */
   
-  .connect-main { display: flex; flex-direction: column; }
+  .connect-main {
+    display: flex;
+    flex-direction: column;
+    padding-top: 40px; /* tighter than the shared 80px — measured (Playwright) to remove real scroll overflow */
+    padding-bottom: 24px;
+  }
+  .connect-main .inner-header { margin-bottom: 32px; }
   
   .connect-grid {
     display: flex;
@@ -608,12 +670,12 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 24px 28px;
-    background: var(--color-white);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 18px 28px;
+    background: var(--surface-card);
+    border: 1px solid rgba(var(--hairline-rgb), 0.06);
     border-radius: 4px;
     text-decoration: none;
-    transition: transform var(--transition-hover), box-shadow var(--transition-hover), border-color var(--transition-hover);
+    transition: transform var(--transition-hover), box-shadow var(--transition-hover), border-color var(--transition-hover), background-color 0.4s ease;
     animation: cardReveal 0.5s ease forwards;
     opacity: 0;
     transform: translateY(12px);
@@ -627,14 +689,14 @@
   .connect-card:hover {
     transform: translateX(8px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
-    border-color: rgba(196, 122, 106, 0.25);
+    border-color: rgba(201, 102, 119, 0.25);
   }
   
   .connect-icon {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(196, 122, 106, 0.08);
+    background: rgba(201, 102, 119, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -643,7 +705,7 @@
     transition: background var(--transition-hover);
   }
   
-  .connect-card:hover .connect-icon { background: rgba(196, 122, 106, 0.15); }
+  .connect-card:hover .connect-icon { background: rgba(201, 102, 119, 0.15); }
   
   .connect-info {
     flex: 1;
@@ -657,20 +719,20 @@
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-muted);
+    color: var(--text-muted);
   }
-  
+
   .connect-value {
     font-family: var(--font-display);
     font-size: 20px;
     font-weight: 400;
-    color: var(--color-ink);
+    color: var(--text-strong);
     letter-spacing: -0.01em;
   }
-  
+
   .connect-arrow {
     font-size: 18px;
-    color: var(--color-muted);
+    color: var(--text-muted);
     transition: color var(--transition-hover), transform var(--transition-hover);
   }
   
@@ -689,9 +751,375 @@
     align-items: center;
     gap: 28px;
     padding: 40px 60px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid rgba(var(--hairline-rgb), 0.06);
   }
   
+  /* =============================================
+     HELLO PAGE (origami note + star jar)
+     ============================================= */
+
+  /* Tighter than the shared .inner-main/.inner-header spacing — this page's
+     whole point is fitting jar + composer on screen with no scrolling — and
+     centered vertically (not just top-padded) so that on a tall viewport
+     the leftover room splits above/below instead of all piling up as dead
+     space between the content and the footer. */
+  .hello-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  .hello-main .inner-header { margin-bottom: 20px; }
+  .hello-main .section-eyebrow { margin-bottom: 6px; }
+  .hello-main .section-title { font-size: clamp(40px, 5vw, 64px); }
+  .hello-main .section-subtitle { margin-top: 8px; }
+  .hello-footer { padding: 24px 60px; }
+  .connect-footer { padding: 24px 60px; }
+
+  .hello-layout {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+    justify-content: space-between; /* composer hugs the left edge, jar the right */
+    margin-top: 0;
+    /* Grows with available viewport height instead of a fixed size tuned
+       only for the shortest screen — (100vh - 419px)/1.1875 is the exact
+       jar width (see .jar's aspect-ratio) that fills a viewport of height
+       100vh with zero leftover space, measured empirically with
+       Playwright across several real viewport sizes; clamped so it
+       neither vanishes on a short window nor grows absurdly large on a
+       very tall one. */
+    --jar-size: clamp(260px, calc((100vh - 419px) / 1.1875), 480px);
+  }
+
+  .jar-panel {
+    flex: 0 1 var(--jar-size); /* no grow — pushed to the row's right edge, not centered in leftover space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .jar {
+    position: relative;
+    width: 100%;
+    max-width: var(--jar-size);
+    aspect-ratio: 16 / 19; /* matches the jar-svg viewBox (320 × 380) */
+  }
+
+  .jar-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .jar-lid  { fill: var(--text-muted); opacity: 0.35; }
+  .jar-neck { fill: var(--text-muted); opacity: 0.2; }
+  .jar-body {
+    fill: rgba(255, 255, 255, 0.45);
+    stroke: rgba(138, 123, 120, 0.35);
+    stroke-width: 2;
+  }
+
+  .jar-stars {
+    position: absolute;
+    left: 14%;
+    right: 14%;
+    top: 16%;
+    bottom: 5%;
+  }
+
+  .jar-count {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .jar-hint {
+    font-size: 13px;
+    font-style: italic;
+    font-family: var(--font-display);
+    color: var(--text-muted);
+    text-align: center;
+    max-width: 280px;
+    line-height: 1.5;
+  }
+
+  .composer-panel {
+    flex: 0 1 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 340px;
+  }
+
+  .swatch-row {
+    display: flex;
+    gap: 14px;
+  }
+
+  .swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--swatch-color);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform var(--transition-hover), border-color var(--transition-hover);
+  }
+
+  .swatch[aria-checked="true"] {
+    border-color: var(--text-strong);
+    transform: scale(1.15);
+  }
+
+  .paper {
+    --paper-color: var(--star-pink);
+    width: 220px;
+    height: 280px;
+    border: none;
+    border-radius: 4px;
+    background: var(--paper-color);
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: transform var(--transition-hover), box-shadow var(--transition-hover);
+  }
+
+  .paper:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .paper-crease {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  .paper-crease--v { left: 50%; top: 8%; bottom: 8%; width: 1px; }
+  .paper-crease--h { top: 50%; left: 8%; right: 8%; height: 1px; }
+
+  .paper-hint {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* Overlay + shared dialog shell */
+
+  .hello-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(250, 248, 246, 0.72);
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+
+  .hello-overlay.is-active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .hello-card {
+    position: fixed;
+    z-index: 201;
+    background: var(--surface-card);
+    border-radius: 4px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    perspective: 900px;
+    transform-style: preserve-3d;
+    transition:
+      top 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      left 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      border-radius 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.3s ease;
+  }
+
+  .hello-card[hidden] { display: none !important; }
+
+  /* The caret lives inside .composer-textarea itself, so we center that
+     whole (naturally-sized) box within this wrapper — centering the box,
+     not its content — which keeps the caret aligned with the visible
+     placeholder instead of jumping to the top on focus. */
+  .composer-textarea-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+  }
+
+  .composer-textarea {
+    width: 100%;
+    text-align: center;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--text-strong);
+    cursor: text;
+  }
+
+  .composer-textarea:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+    font-style: italic;
+    pointer-events: none;
+  }
+
+  .composer-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  .composer-count.is-low { color: var(--color-accent); font-weight: 500; }
+
+  .composer-error {
+    font-size: 13px;
+    color: var(--color-accent);
+  }
+
+  .honeypot-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .hello-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 16px;
+  }
+
+  .read-card-body {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--text-strong);
+    text-align: center;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Stars inside the jar */
+
+  .star {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transform: translate(-50%, -50%) scale(0);
+    animation: starPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .star svg {
+    width: 100%;
+    height: 100%;
+    fill: var(--star-color);
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+    transition: transform var(--transition-hover);
+    animation: starInvite 2.6s ease-in-out infinite;
+  }
+
+  .star:hover svg,
+  .star:focus-visible svg {
+    transform: scale(1.25);
+    animation-play-state: paused;
+  }
+
+  @keyframes starPop {
+    0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    70%  { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+
+  /* Gentle glow invitation so it reads as clickable (filter only —
+     transform is left free for the hover/focus scale above). */
+  @keyframes starInvite {
+    0%, 100% { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15)); }
+    50%      { filter: drop-shadow(0 3px 9px rgba(201, 102, 119, 0.55)); }
+  }
+
+  /* Fold animation (paper → star) */
+
+  .hello-card.is-folding .composer-textarea,
+  .hello-card.is-folding .hello-card-actions,
+  .hello-card.is-folding .composer-count {
+    animation: contentFadeOut 0.15s ease forwards;
+  }
+
+  @keyframes contentFadeOut {
+    to { opacity: 0; transform: scale(0.9); }
+  }
+
+  .hello-card.is-folding {
+    animation: paperFoldSequence 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
+  }
+
+  @keyframes paperFoldSequence {
+    0%   { clip-path: inset(0 0 0 0);     transform: scaleX(1)    scaleY(1)    rotateY(0deg)   rotateX(0deg); }
+    40%  { clip-path: inset(0 50% 0 0);   transform: scaleX(0.5)  scaleY(1)    rotateY(-25deg) rotateX(0deg); }
+    70%  { clip-path: inset(0 50% 50% 0); transform: scaleX(0.5)  scaleY(0.5)  rotateY(-45deg) rotateX(15deg); }
+    100% { clip-path: inset(0 50% 50% 0); transform: scaleX(0.15) scaleY(0.15) rotateY(-70deg) rotateX(20deg); opacity: 0; }
+  }
+
+  .fold-star {
+    position: fixed;
+    z-index: 250;
+    width: 28px;
+    height: 28px;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+    pointer-events: none;
+  }
+
+  .fold-star svg { width: 100%; height: 100%; fill: var(--star-color); }
+
+  .fold-star.is-emerging { animation: starEmerge 0.3s ease 0.35s forwards; }
+
+  @keyframes starEmerge {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-30deg); }
+    60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(8deg); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  }
+
+  .fold-star.is-arcing { animation: starArc 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+  @keyframes starArc {
+    0%   { transform: translate(calc(-50% + var(--start-x, 0px)), calc(-50% + var(--start-y, 0px))) scale(1); opacity: 1; }
+    50%  { transform: translate(calc(-50% + var(--mid-x, 0px)),   calc(-50% + var(--mid-y, 0px)))   scale(0.7); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--end-x, 0px)),   calc(-50% + var(--end-y, 0px)))   scale(0.42); opacity: 0.95; }
+  }
+
   /* =============================================
      MOBILE RESPONSIVE
      ============================================= */
@@ -702,10 +1130,16 @@
     .nav-inner { padding: 0 24px; }
   
     .hero-main {
-      padding: 0 28px 60px;
-      align-items: flex-end;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      padding: 28px 28px 85px;
     }
-  
+
+    .hero-right { flex: 0 0 190px; }
+    .hero-left { flex: 0 0 auto; padding-bottom: 24px; }
+    .glyph-box { max-width: 280px; bottom: auto; top: 0; }
+
     .hero-name { font-size: clamp(60px, 16vw, 80px); }
   
     .home-footer { gap: 20px; padding-bottom: 28px; }
@@ -719,15 +1153,13 @@
     .connect-card { padding: 20px; }
   
     .inner-footer { padding: 28px 24px; gap: 20px; }
-  
-    .hover-zone {
-      right: 4%;
-      width: 28%;
-      height: 45%;
-      top: 18%;
-    }
+
+    .hello-layout { flex-direction: column; align-items: center; gap: 40px; }
+    .jar-panel { flex: none; width: 100%; }
+    .jar { max-width: 340px; }
+    .composer-panel { max-width: 100%; align-items: center; text-align: center; padding-top: 0; }
   }
-  
+
   @media (max-width: 480px) {
     .nav-links { gap: 20px; }
     .nav-link  { font-size: 13px; }
