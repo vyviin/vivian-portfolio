@@ -477,7 +477,7 @@
     justify-content: center;
     align-items: center;
     gap: 28px;
-    padding: 0 0 40px;
+    padding: 24px 0; /* same top/bottom rhythm as .inner-footer, so the social links sit at the same height on every page */
   }
   
   .footer-icon {
@@ -750,7 +750,7 @@
     justify-content: center;
     align-items: center;
     gap: 28px;
-    padding: 40px 60px;
+    padding: 24px 60px; /* was 40px — matches home-footer's rhythm, and was the one page-consistency gap: this used to only be reduced on hello/connect, leaving projects.html's footer sitting at a different height */
     border-top: 1px solid rgba(var(--hairline-rgb), 0.06);
   }
   
@@ -766,39 +766,57 @@
   .hello-main {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding-top: 24px;
-    padding-bottom: 24px;
+    justify-content: flex-start; /* pinned to the top instead of centered, so it always sits as high as the padding allows */
+    /* 86px, not the shared .inner-main default of 80px, because this page's
+       eyebrow-to-title spacing is tighter than the shared default (see
+       .section-eyebrow below) — this value makes the TITLE itself land at
+       the same height as projects.html's title, which is the thing actually
+       being aligned, not just matching the raw padding number. */
+    padding-top: 86px;
+    padding-bottom: 16px;
   }
-  .hello-main .inner-header { margin-bottom: 20px; }
+  .hello-main .inner-header { margin-bottom: 14px; }
   .hello-main .section-eyebrow { margin-bottom: 6px; }
   .hello-main .section-title { font-size: clamp(40px, 5vw, 64px); }
   .hello-main .section-subtitle { margin-top: 8px; }
-  .hello-footer { padding: 24px 60px; }
-  .connect-footer { padding: 24px 60px; }
 
   .hello-layout {
     display: flex;
-    gap: 48px;
+    gap: 48px; /* a bit more than the exact-alignment value, per request — nudges the jar right */
     align-items: flex-start;
-    justify-content: space-between; /* composer hugs the left edge, jar the right */
-    margin-top: 0;
-    /* Grows with available viewport height instead of a fixed size tuned
-       only for the shortest screen — (100vh - 419px)/1.1875 is the exact
-       jar width (see .jar's aspect-ratio) that fills a viewport of height
-       100vh with zero leftover space, measured empirically with
-       Playwright across several real viewport sizes; clamped so it
-       neither vanishes on a short window nor grows absurdly large on a
-       very tall one. */
-    --jar-size: clamp(260px, calc((100vh - 419px) / 1.1875), 480px);
+    /* Both measured directly (Playwright) against the real rendered
+       header/paper, not guessed from font metrics: --jar-top-offset is
+       exactly the eyebrow's rendered height + margin, so the jar's top
+       lines up with "Say Hello" itself; --jar-size is whatever width
+       makes [jar + its two gaps + jar-count + jar-hint] exactly span
+       from the title's top to the paper's bottom. Re-measure and update
+       both if the header/paper copy or sizing ever changes. */
+    --jar-top-offset: 45px; /* 25px is exact alignment with "Say Hello"'s top; +20px nudges it down a bit, per request */
+    --jar-size: 359px; /* re-tuned after the paper got shorter, to keep the same ~20px offset below the paper's (now higher) bottom */
+  }
+
+  .hello-left {
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 560px;
+    min-width: 0;
+  }
+
+  .hello-right {
+    flex: 0 1 var(--jar-size);
+    min-width: 0;
+    /* Pulls the jar-panel down from the column's own top (where the
+       eyebrow "leave a message" sits) so the JAR's top lines up with
+       "Say Hello" itself, one line lower — measured directly against the
+       real rendered header, not guessed from font metrics. */
+    padding-top: var(--jar-top-offset, 0px);
   }
 
   .jar-panel {
-    flex: 0 1 var(--jar-size); /* no grow — pushed to the row's right edge, not centered in leftover space */
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
   }
 
   .jar {
@@ -816,11 +834,15 @@
     pointer-events: none;
   }
 
-  .jar-lid  { fill: var(--text-muted); opacity: 0.35; }
-  .jar-neck { fill: var(--text-muted); opacity: 0.2; }
+  /* rgba(var(--hairline-rgb), X) instead of a hardcoded near-white fill —
+     hairline-rgb is dark in light mode / light in dark mode (same token
+     nav.inner-nav's border uses), so the jar always contrasts against
+     --surface-inner instead of nearly vanishing on a light background. */
+  .jar-lid  { fill: rgba(var(--hairline-rgb), 0.45); }
+  .jar-neck { fill: rgba(var(--hairline-rgb), 0.28); }
   .jar-body {
-    fill: rgba(255, 255, 255, 0.45);
-    stroke: rgba(138, 123, 120, 0.35);
+    fill: rgba(var(--hairline-rgb), 0.05);
+    stroke: rgba(var(--hairline-rgb), 0.35);
     stroke-width: 2;
   }
 
@@ -880,8 +902,8 @@
 
   .paper {
     --paper-color: var(--star-pink);
-    width: 220px;
-    height: 280px;
+    width: 250px;
+    height: 280px; /* a bit shorter than before */
     border: none;
     border-radius: 4px;
     background: var(--paper-color);
@@ -1155,9 +1177,11 @@
     .inner-footer { padding: 28px 24px; gap: 20px; }
 
     .hello-layout { flex-direction: column; align-items: center; gap: 40px; }
-    .jar-panel { flex: none; width: 100%; }
+    .hello-left { flex: 0 0 auto; width: 100%; }
+    .hello-right { flex: 0 0 auto; width: 100%; padding-top: 0; } /* title-alignment offset only makes sense side-by-side */
+    .jar-panel { width: 100%; }
     .jar { max-width: 340px; }
-    .composer-panel { max-width: 100%; align-items: center; text-align: center; padding-top: 0; }
+    .composer-panel { max-width: 100%; align-items: center; text-align: center; }
   }
 
   @media (max-width: 480px) {
