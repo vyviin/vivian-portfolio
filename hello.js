@@ -86,12 +86,12 @@
 
   async function loadMessages() {
     if (!db) {
-      jarCountEl.textContent = 'connect a Supabase project to enable the jar';
+      jarCountEl.textContent = 'Connect a Supabase project to enable the jar.';
       return;
     }
     const { data, error } = await db.from('jar_messages').select('*').order('created_at');
     if (error) {
-      jarCountEl.textContent = "couldn't load messages";
+      jarCountEl.textContent = "Couldn't load messages.";
       return;
     }
     messages = data || [];
@@ -121,7 +121,7 @@
   function updateJarCount() {
     const n = messages.length;
     jarCountEl.textContent = n === 0
-      ? 'no messages yet — be the first'
+      ? 'No messages yet. Be the first.'
       : n + (n === 1 ? ' message' : ' messages');
   }
 

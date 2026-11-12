@@ -4,7 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vivian Yang</title>
-  <link rel="icon" type="image/x-icon" href="favicon.PNG">
+  <meta name="description" content="Vivian Yang — CS &amp; BBA double degree at the University of Waterloo and Wilfrid Laurier University.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Vivian Yang">
+  <meta property="og:title" content="Vivian Yang">
+  <meta property="og:description" content="Vivian Yang — CS &amp; BBA double degree at the University of Waterloo and Wilfrid Laurier University.">
+  <meta property="og:url" content="https://vyviin.github.io/vivian-portfolio/">
+  <meta property="og:image" content="https://vyviin.github.io/vivian-portfolio/favicon.PNG">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" type="image/png" href="favicon.PNG">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -20,20 +28,31 @@
         })();
         if (night) document.documentElement.setAttribute('data-theme', 'night');
       } catch (e) {}
+      // Arriving from another page by the particle transition: hide the
+      // main content before first paint; script.js takes it from there.
+      try {
+        var at = +sessionStorage.getItem('vy-tx-at');
+        if (at && Date.now() - at < 4000 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.classList.add('tx-in', 'tx-arrived');
+        }
+      } catch (e) {}
     })();
   </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="home-page">
 
+  <!-- ── Water: a still surface the cursor ripples (initWater() in script.js) ── -->
+  <canvas id="waterCanvas" aria-hidden="true"></canvas>
+
   <!-- ── Navigation ── -->
   <nav id="mainNav">
     <div class="nav-inner">
-      <a href="index.html" class="nav-logo">vy.</a>
+      <a href="index.html" class="nav-logo" aria-label="vy., home"><span class="g" aria-hidden="true">v</span><span class="g" aria-hidden="true">y</span><span class="g g-dot" aria-hidden="true">.</span></a>
       <div class="nav-links">
-        <a href="index.html" class="nav-link active">home</a>
-        <a href="projects.html" class="nav-link">projects</a>
-        <a href="hello.html" class="nav-link">connect</a>
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="projects.html" class="nav-link">Projects</a>
+        <a href="hello.html" class="nav-link">Connect</a>
         <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle day and night mode" aria-pressed="false">
           <span class="theme-toggle-icon" aria-hidden="true">☾</span>
         </button>
@@ -44,22 +63,14 @@
   <!-- ── Hero Content ── -->
   <main class="hero-main">
     <div class="hero-left">
-      <p class="hero-eyebrow">hi, i'm</p>
-      <h1 class="hero-name">Vivian<span class="name-accent">.</span></h1>
+      <p class="hero-eyebrow">Hi, I'm</p>
+      <h1 class="hero-name" data-tx-word>Vivian<span class="name-accent">.</span></h1>
 
-      <!-- Education bullets with triangle nudge -->
-      <ul class="edu-list">
-        <li class="edu-item">
-          <span class="edu-text">CS &amp; BBA Double Degree</span>
-        </li>
-        <li class="edu-item">
-          <span class="edu-text edu-school">University of Waterloo × Wilfrid Laurier University</span>
-        </li>
-      </ul>
+      <p class="hero-intro">CS + BBA double degree student @ University of Waterloo and Wilfrid Laurier University.</p>
 
       <div class="hero-actions">
-        <a href="projects.html" class="btn-primary">view projects →</a>
-        <a href="hello.html" class="btn-ghost">say hello</a>
+        <a href="projects.html" class="btn-primary">View projects <span class="arr" aria-hidden="true">→</span></a>
+        <a href="hello.html" class="btn-ghost">Say hello</a>
       </div>
     </div>
 
@@ -87,7 +98,6 @@
     </a>
   </footer>
 
-  <div class="page-transition" id="pageTransition"></div>
   <script src="script.js"></script>
 </body>
 </html>
